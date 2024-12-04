@@ -29,12 +29,18 @@ public class DispatchFunction
         log.LogInformation("Processing dispatch request.");
 
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+
+        // Deserialize Json payload
         var loadData = JsonSerializer.Deserialize<LoadData>(requestBody);
 
         string tempFilePath = Path.GetTempFileName();
+
+        // Map Json to CSV
         _mapper.MapToCsv(loadData, tempFilePath);
 
-        string remoteFileName = $"dispatch-{loadData}.csv";
+        string remoteFileName = $"dispatch-{loadData.SalesOrder}.csv";
+
+        // Upload to SFTP storage
         await _sftpService.UploadFileAsync(tempFilePath, remoteFileName);
 
         log.LogInformation("Dispatch request processed successfully.");
