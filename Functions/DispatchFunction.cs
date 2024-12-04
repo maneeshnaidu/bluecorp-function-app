@@ -8,6 +8,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using Azure.Storage.Blobs;
+using System.Text;
+using System.Net;
 
 
 public class DispatchFunction
@@ -39,6 +42,14 @@ public class DispatchFunction
         _mapper.MapToCsv(loadData, tempFilePath);
 
         string remoteFileName = $"dispatch-{loadData.SalesOrder}.csv";
+
+        // Upload to Blob Storage
+        // var blobClient = new BlobContainerClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "incoming");
+        // var blob = blobClient.GetBlobClient(remoteFileName);
+
+        // await blob.UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes(csvContent)), overwrite: true);
+
+        // return req.CreateResponse(HttpStatusCode.OK);
 
         // Upload to SFTP storage
         await _sftpService.UploadFileAsync(tempFilePath, remoteFileName);

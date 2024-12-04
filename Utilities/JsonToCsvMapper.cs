@@ -8,6 +8,7 @@ public class JsonToCsvMapper
 {
     public void MapToCsv(LoadData loadData, string outputPath)
     {
+        // var stream = new MemoryStream();
         using var writer = new StreamWriter(outputPath);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
@@ -35,6 +36,9 @@ public class JsonToCsvMapper
                 csv.NextRecord();
             }
         }
+
+        // stream.Position = 0; // Reset stream position
+        // return stream;
     }
 
     private static string ConvertContainerType(string containerType)
