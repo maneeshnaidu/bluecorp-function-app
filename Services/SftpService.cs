@@ -9,11 +9,11 @@ public class SftpService
     private readonly string _username;
     private readonly string _privateKeyPath;
 
-    public SftpService(string host, string username, string privateKeyPath)
+    public SftpService()
     {
-        _host = host;
-        _username = username;
-        _privateKeyPath = privateKeyPath;
+        _host = Environment.GetEnvironmentVariable("SFTP_HOST");
+        _username = Environment.GetEnvironmentVariable("SFTP_USERNAME");
+        _privateKeyPath = Environment.GetEnvironmentVariable("SFTP_PRIVATE_KEY");
     }
 
     public async Task UploadFileAsync(string localFilePath, string remoteFileName)
