@@ -79,7 +79,7 @@ namespace BlueCorp.DispatchFunction
             _mapper.MapToCsv(payload, tempFilePath);
 
             // Upload to SFTP storage
-            await _sftpService.UploadFileAsync(tempFilePath, FileUploadHelper(tempFilePath));
+            await _sftpService.UploadFileAsync(tempFilePath, FileUploadHelper(_incomingFolder));
 
             _logger.LogInformation("Dispatch request processed successfully.");
             return new OkResult();
