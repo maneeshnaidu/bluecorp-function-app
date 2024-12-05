@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace bluecorp_function_app.Interfaces
 {
-    public interface ISftpService
+    public interface IHttpRetryService
     {
-        Task MoveCsvFilesAsync();
-        Task UploadFileAsync(string localFilePath, string remoteFileName);
+        Task ExecuteWithRetryAsync(Func<Task> action);
     }
 }

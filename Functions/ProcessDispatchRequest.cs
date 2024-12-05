@@ -14,17 +14,25 @@ namespace BlueCorp.DispatchFunction
         private readonly IJsonToCsvMapper _mapper;
         private readonly ISftpService _sftpService;
         private readonly ILogger<ProcessDispatchRequest> _logger;
+        private readonly string _failedFolder;
+        private readonly string _incomingFolder;
 
-        public ProcessDispatchRequest(ILogger<ProcessDispatchRequest> logger, IJsonToCsvMapper mapper, ISftpService sftpService)
+
+        public ProcessDispatchRequest(ILogger<ProcessDispatchRequest> logger,  
+            IJsonToCsvMapper mapper, 
+            ISftpService sftpService)
         {
             _logger = logger;
             _mapper = mapper;
             _sftpService = sftpService;
+            _incomingFolder = Environment.GetEnvironmentVariable("SftpRemotePath") ?? string.Empty;
+            _failedFolder = Environment.GetEnvironmentVariable("SftpFailedFolder") ?? string.Empty;
         }
 
         [Function("ProcessDispatchRequest")]
-        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
+            string fullPath = string.Empty;
             _logger.LogInformation("Processing dispatch request.");
 
             // Read the request body 
@@ -34,22 +42,38 @@ namespace BlueCorp.DispatchFunction
             var payload = JsonConvert.DeserializeObject<LoadData>(requestBody);
 
             string tempFilePath = Path.GetTempFileName();
+            // Map Json to CSV
+            _mapper.MapToCsv(payload, tempFilePath);
+            // Generate a new GUID
+            string guid = Guid.NewGuid().ToString();
+
+            string remoteFileName = $"dispatch-{guid}.csv";
+
+            // Set maximum payload size (800 KB)
+            const int maxPayloadSize = 800 * 1024;
+
+            // Check Content-Length header
+            if (req.ContentLength > maxPayloadSize)
+            {
+                fullPath = _failedFolder + remoteFileName;
+                // Upload to SFTP storage
+            await _sftpService.UploadFileAsync(tempFilePath, fullPath);
+                return new BadRequestObjectResult($"Payload exceeds the maximum allowed size of {maxPayloadSize / 1024} KB.");
+            }
+
+            
 
             // Map Json to CSV
             _mapper.MapToCsv(payload, tempFilePath);
+            // Generate a new GUID
+            guid = Guid.NewGuid().ToString();
 
-            string remoteFileName = $"dispatch-{payload.SalesOrder}.csv";
+            remoteFileName = $"dispatch-{guid}.csv";
 
-            // Upload to Blob Storage
-            // var blobClient = new BlobContainerClient(Environment.GetEnvironmentVariable("BlobStorageConnectionString"), "incoming");
-            // var blob = blobClient.GetBlobClient(remoteFileName);
-
-            // await blob.UploadAsync(new MemoryStream(Encoding.UTF8.GetBytes(csvContent)), overwrite: true);
-
-            // return req.CreateResponse(HttpStatusCode.OK);
+            fullPath = _incomingFolder + remoteFileName; 
 
             // Upload to SFTP storage
-            await _sftpService.UploadFileAsync(tempFilePath, remoteFileName);
+            await _sftpService.UploadFileAsync(tempFilePath, fullPath);
 
             _logger.LogInformation("Dispatch request processed successfully.");
             return new OkResult();

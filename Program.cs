@@ -1,4 +1,5 @@
 using bluecorp_function_app.Interfaces;
+using bluecorp_function_app.Services;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +9,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 // Add related dependencies
 builder.Services.AddScoped<IJsonToCsvMapper, JsonToCsvMapper>();
 builder.Services.AddScoped<ISftpService, SftpService>();
+builder.Services.AddScoped<IHttpRetryService, HttpRetryService>();
 
 builder.ConfigureFunctionsWebApplication();
 
