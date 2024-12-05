@@ -1,5 +1,6 @@
 public class LoadData
 {
+    public string ControlNumber { get; set; }
     public string SalesOrder { get; set; }
     public DeliveryAddress DeliveryAddress { get; set; }
     public List<Container> Containers { get; set; }

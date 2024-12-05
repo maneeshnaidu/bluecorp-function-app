@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using bluecorp_function_app.Interfaces;
 using bluecorp_function_app.Models;
 using CsvHelper;
 
-public class JsonToCsvMapper
+public class JsonToCsvMapper : IJsonToCsvMapper
 {
     public void MapToCsv(LoadData loadData, string outputPath)
     {

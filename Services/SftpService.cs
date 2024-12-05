@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using bluecorp_function_app.Interfaces;
 using Renci.SshNet;
 
-public class SftpService
+public class SftpService : ISftpService
 {
     private readonly string _host;
     private readonly string _username;
@@ -11,9 +12,9 @@ public class SftpService
 
     public SftpService()
     {
-        _host = Environment.GetEnvironmentVariable("SFTP_HOST");
-        _username = Environment.GetEnvironmentVariable("SFTP_USERNAME");
-        _privateKeyPath = Environment.GetEnvironmentVariable("SFTP_PRIVATE_KEY");
+        _host = Environment.GetEnvironmentVariable("SftpHost");
+        _username = Environment.GetEnvironmentVariable("SftpUsername");
+        _privateKeyPath = Environment.GetEnvironmentVariable("SftpPrivateKeyPath");
     }
 
     public async Task UploadFileAsync(string localFilePath, string remoteFileName)
