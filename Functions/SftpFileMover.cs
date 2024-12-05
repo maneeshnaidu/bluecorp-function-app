@@ -22,7 +22,7 @@ namespace BlueCorp.DispatchFunction
         }
 
         [Function("SftpFileMover")]
-        public async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer)
+        public async Task Run([TimerTrigger("0 */5 * * * *")] TimerInfo myTimer)
         {
             _logger.LogInformation($"SFTP File Mover function executed at: {DateTime.Now}");
 

@@ -77,9 +77,12 @@ namespace BlueCorp.DispatchFunction
 
             // Map Json to CSV
             _mapper.MapToCsv(payload, tempFilePath);
+            // Generate a new GUID
+            string guid = Guid.NewGuid().ToString();
+            string remoteFileName = $"dispatch-{guid}.csv";
 
             // Upload to SFTP storage
-            await _sftpService.UploadFileAsync(tempFilePath, FileUploadHelper(_incomingFolder));
+            await _sftpService.UploadFileAsync(tempFilePath, remoteFileName);
 
             _logger.LogInformation("Dispatch request processed successfully.");
             return new OkResult();
