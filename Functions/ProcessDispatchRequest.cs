@@ -64,6 +64,8 @@ namespace BlueCorp.DispatchFunction
                 _mapper.MapToCsv(payload, tempFilePath);
                 // Upload to SFTP storage
                 await _sftpService.UploadFileAsync(tempFilePath, FileUploadHelper(_failedFolder));
+                // Store ControlNumber
+                await _validationService.StoreControlNumberAsync(payload.ControlNumber);
             }
 
             // Set maximum payload size (800 KB)
