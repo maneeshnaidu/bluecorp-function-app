@@ -83,6 +83,9 @@ namespace BlueCorp.DispatchFunction
             string guid = Guid.NewGuid().ToString();
             string remoteFileName = $"dispatch-{guid}.csv";
 
+            // Store ControlNumber
+            await _validationService.StoreControlNumberAsync(payload.ControlNumber);
+
             // Upload to SFTP storage
             await _sftpService.UploadFileAsync(tempFilePath, remoteFileName);
 
